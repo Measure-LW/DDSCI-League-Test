@@ -1,0 +1,89 @@
+import random
+
+ELEMENT_COUNTERS = [('W', 'F'), ('F', 'E'), ('E', 'W')]
+
+class Element:
+	Void = 0
+	Earth = 1
+	Fire = 2
+	Water = 3
+	Counters = [(Water, Fire), (Fire, Earth), (Earth, Water)]
+
+class Champion:
+	def __init__(self, element, power):
+		self.element = element
+		self.power = power
+
+	def beats(self, other):
+		if (self.element, other.element) in ELEMENT_COUNTERS: return True
+		if (other.element, self.element) in ELEMENT_COUNTERS: return False
+		if self.power > other.power: return True
+		elif other.power > self.power: return False
+		else: return random.choice([True, False])
+
+class Team:
+	def __init__(self, player, champions):
+		self.player = player
+		self.champions = champions
+
+	def beats(self, other):
+		self_team = [c for c in self.champions]
+		other_team = [c for c in other.champions]
+		while True:
+			if len(self_team) == 0: return False
+			if len(other_team) == 0: return True
+			random.shuffle(self_team)
+			random.shuffle(other_team)
+			if self_team[0].beats(other_team[0]): other_team.pop(0)
+			else: self_team.pop(0)
+
+Void5 = Champion('V', 5)
+Earth1 = Champion('E', 1)
+Earth2 = Champion('E', 2)
+Earth3 = Champion('E', 3)
+Earth4 = Champion('E', 4)
+Earth5 = Champion('E', 5)
+Earth6 = Champion('E', 6)
+Fire1 = Champion('F', 1)
+Fire2 = Champion('F', 2)
+Fire3 = Champion('F', 3)
+Fire4 = Champion('F', 4)
+Fire5 = Champion('F', 5)
+Fire6 = Champion('F', 6)
+Water1 = Champion('W', 1)
+Water2 = Champion('W', 2)
+Water3 = Champion('W', 3)
+Water4 = Champion('W', 4)
+Water5 = Champion('W', 5)
+Water6 = Champion('W', 6)
+
+def test0(trials):
+	teams = []
+	teams.append(Team("Alumium", [Fire6, Water6, Earth1, Earth5, Earth6]))
+	teams.append(Team("simon", [Fire2, Fire6, Water1, Water6, Earth6]))
+	teams.append(Team("Maxwell Peterson", [Fire6, Water6, Earth1, Earth6, Void5]))
+	teams.append(Team("Jemist", [Fire6, Water6, Earth5, Earth6, Void5]))
+	teams.append(Team("abstractapplic", [Fire5, Fire6, Water6, Earth6, Void5]))
+	teams.append(Team("gjm", [Fire5, Fire6, Water6, Earth6, Void5]))
+	teams.append(Team("GuySrinivasan", [Fire6, Water5, Water6, Earth6, Void5]))
+	teams.append(Team("Yonge", [Water6, Earth1, Earth5, Earth6, Void5]))
+	teams.append(Team("Measure", [Fire1, Water4, Water6, Earth1, Void5]))
+	teams.append(Team("lsusr", [Fire4, Water1, Water5, Earth5, Void5]))
+
+	print("",end=',')
+	for team in teams:
+		print(team.player,end=',')
+	print("Score:")
+	for team in teams:
+		print(team.player,end=',')
+		total = 0
+		for opp in teams:
+			if team.player == opp.player: print("",end=',')
+			else:
+				wins = sum([team.beats(opp) for t in range(trials)])
+				total += wins/trials
+				print("{:.2%}".format(wins/trials),end=',')
+		print("{:.4f}".format(total))
+
+if __name__ == "__main__":
+	test0(100000)
