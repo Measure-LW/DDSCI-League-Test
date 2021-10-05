@@ -2,13 +2,6 @@ import random
 
 ELEMENT_COUNTERS = [('W', 'F'), ('F', 'E'), ('E', 'W')]
 
-class Element:
-	Void = 0
-	Earth = 1
-	Fire = 2
-	Water = 3
-	Counters = [(Water, Fire), (Fire, Earth), (Earth, Water)]
-
 class Champion:
 	def __init__(self, element, power):
 		self.element = element
@@ -17,9 +10,11 @@ class Champion:
 	def beats(self, other):
 		if (self.element, other.element) in ELEMENT_COUNTERS: return True
 		if (other.element, self.element) in ELEMENT_COUNTERS: return False
+		if (self.power, other.power) == (1, 6): return True
+		if (self.power, other.power) == (6, 1): return False
 		if self.power > other.power: return True
-		elif other.power > self.power: return False
-		else: return random.choice([True, False])
+		if other.power > self.power: return False
+		return random.choice([True, False])
 
 class Team:
 	def __init__(self, player, champions):
@@ -27,15 +22,15 @@ class Team:
 		self.champions = champions
 
 	def beats(self, other):
-		self_team = [c for c in self.champions]
-		other_team = [c for c in other.champions]
+		self_lineup = [c for c in self.champions]
+		other_lineup = [c for c in other.champions]
 		while True:
-			if len(self_team) == 0: return False
-			if len(other_team) == 0: return True
-			random.shuffle(self_team)
-			random.shuffle(other_team)
-			if self_team[0].beats(other_team[0]): other_team.pop(0)
-			else: self_team.pop(0)
+			if len(self_lineup) == 0: return False
+			if len(other_lineup) == 0: return True
+			self_choice = random.choice(self_lineup)
+			other_choice = random.choice(other_lineup)
+			if self_choice.beats(other_choice): other_lineup.remove(other_choice)
+			else: self_lineup.remove(self_choice)
 
 Void5 = Champion('V', 5)
 Earth1 = Champion('E', 1)
